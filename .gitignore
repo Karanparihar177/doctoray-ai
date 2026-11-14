@@ -34,3 +34,11 @@ audio/
 
 # OS
 .DS_Store
+
+# Test data
+data/
+*.part
+*.mp4
+*.mov
+*.wav
+*.mp3
