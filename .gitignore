@@ -25,9 +25,7 @@ htmlcov/
 # Temporary processing files
 temp/
 tmp/
-data/
-recordings/
-audio/
+data/recordings/
 
 # Logs
 *.log
@@ -36,9 +34,16 @@ audio/
 .DS_Store
 
 # Test data
-data/
 *.part
 *.mp4
 *.mov
 *.wav
 *.mp3
+*.flac
+
+# Dev data tracked in git: public PriMock57 transcripts, generated audio and
+# Deepgram transcripts. WAV files and data/recordings/ stay ignored (see above).
+# Real consultation files must never be committed, so the default
+# "appointment" names stay ignored.
+data/audio/appointment*
+data/transcripts/appointment*

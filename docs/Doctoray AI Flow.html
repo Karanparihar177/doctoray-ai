@@ -1,0 +1,337 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Doctoray AI Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+/* Layout: one narrow reading column; wide swim-lane figures scroll sideways inside their own box on phones. */
+:root {
+  --bg: #f4f7f8;
+  --surface: #ffffff;
+  --fg: #14232b;
+  --muted: #55666f;
+  --line: #c9d5db;
+  --accent: #0b7a75;
+  --accent-soft: #d8eeec;
+  --gate: #a8500a;
+  --gate-soft: #fbe9d0;
+  --font-head: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1a1f; --surface: #15252c; --fg: #e3edf0; --muted: #9db1b9; --line: #2c424b;
+    --accent: #4fd1c5; --accent-soft: #123a3b; --gate: #f2a65a; --gate-soft: #3b2a12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1a1f; --surface: #15252c; --fg: #e3edf0; --muted: #9db1b9; --line: #2c424b;
+  --accent: #4fd1c5; --accent-soft: #123a3b; --gate: #f2a65a; --gate-soft: #3b2a12;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+h1, h2, h3 { font-family: var(--font-head); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 30px; font-weight: 700; }
+h2 { font-size: 21px; font-weight: 600; }
+h3 { font-size: 15px; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.lede { color: var(--muted); margin-top: 8px; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.scroll svg { display: block; width: 100%; min-width: 780px; height: auto; color: var(--fg); }
+figcaption { color: var(--muted); font-size: 13.5px; max-width: 80ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 8px; }
+.sw { width: 16px; height: 12px; border: 1.5px solid var(--line); border-radius: 3px; display: inline-block; }
+.sw.ai { background: var(--accent-soft); border-color: var(--accent); }
+.sw.gate { background: var(--gate-soft); border-color: var(--gate); }
+.sw.ext { background: var(--surface); border-color: var(--line); border-style: dashed; }
+.ln { width: 22px; border-top: 1.5px solid var(--fg); display: inline-block; }
+.ln.d { border-top-style: dashed; }
+.ln.b { border-top: 2px dashed var(--accent); }
+
+/* svg parts */
+.lane { fill: var(--fg); fill-opacity: .03; }
+.lane-title { fill: var(--fg); font: 600 12.5px var(--font-head); text-anchor: middle; }
+.lane-sub { fill: var(--muted); font: 400 10.5px var(--font-body); text-anchor: middle; }
+.box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.box.ai { fill: var(--accent-soft); stroke: var(--accent); }
+.box.gate { fill: var(--gate-soft); stroke: var(--gate); }
+.box.ext { stroke-dasharray: 5 3; }
+.box.warn { fill: none; stroke: var(--gate); stroke-dasharray: 5 3; }
+.bt { fill: var(--fg); font: 600 12px var(--font-body); }
+.bd { fill: var(--muted); font: 400 11px var(--font-body); }
+.el { fill: var(--muted); font: 400 10.5px var(--font-body); text-anchor: middle; }
+.ar { stroke: var(--fg); stroke-width: 1.4; fill: none; }
+.ar.d { stroke-dasharray: 4 3; }
+.edge-note { fill: var(--accent); font: 500 11px var(--font-body); text-anchor: middle; }
+.bound { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 4; }
+.st { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.st.ai { fill: var(--accent-soft); stroke: var(--accent); }
+.st.gate { fill: var(--gate-soft); stroke: var(--gate); }
+.st.bad { fill: none; stroke: var(--gate); stroke-dasharray: 5 3; }
+.stt { fill: var(--fg); font: 600 12px var(--font-body); text-anchor: middle; }
+
+/* tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; vertical-align: top; border-bottom: 1px solid var(--line); }
+tr:last-child td { border-bottom: 0; }
+th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td:first-child { font-weight: 500; width: 30%; }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--line); white-space: nowrap; }
+.tag.ok { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.tag.later { color: var(--muted); }
+.tag.open { color: var(--gate); border-color: var(--gate); background: var(--gate-soft); }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.rule { border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.rule p { font-size: 14px; color: var(--muted); }
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Doctoray AI POC</div>
+  <h1>How the AI service works with our backend</h1>
+  <p class="lede">The Node.js backend stays the front door and the source of truth. The FastAPI service does the heavy processing and hands back drafts. FLAC and Opus are shown as one step, "compressed audio".</p>
+</header>
+
+<section>
+  <h2>Decisions so far</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Topic</th><th>Status</th><th>Decision</th></tr></thead>
+      <tbody>
+        <tr><td>Roles</td><td><span class="tag ok">Decided</span></td><td>Node.js backend owns auth, appointments, MySQL and the final record. The AI service only processes and returns drafts.</td></tr>
+        <tr><td>Auth</td><td><span class="tag ok">Decided</span></td><td>One token for the Node.js backend and the AI service. The AI service verifies it on every call.</td></tr>
+        <tr><td>Database</td><td><span class="tag ok">Decided</span></td><td>The existing MySQL holds jobs, drafts and confirmed notes.</td></tr>
+        <tr><td>Audio format</td><td><span class="tag ok">Decided</span></td><td>FLAC and Opus are one "compressed audio" step. Pick the format from transcription quality and the provider's file limit.</td></tr>
+        <tr><td>Draft, then confirm</td><td><span class="tag ok">Decided</span></td><td>Every AI output is a draft. Only the doctor's explicit confirm makes it final.</td></tr>
+        <tr><td>Keep it simple</td><td><span class="tag ok">Decided</span></td><td>No message queue, vector DB, RAG or agents for now.</td></tr>
+        <tr><td>Job status sync and presigned URL</td><td><span class="tag later">Later</span></td><td>The backend creates the job and a short-lived S3 URL. The AI service reports status back. This replaces the open HTTP downloader.</td></tr>
+        <tr><td>Who writes to MySQL</td><td><span class="tag open">Open</span></td><td>Recommended: only the backend writes. The AI service returns JSON through a callback or the backend polls it. This keeps one writer and one set of rules.</td></tr>
+        <tr><td>Speech-to-text and LLM providers</td><td><span class="tag open">Open</span></td><td>Test mixed Arabic and English first. Check privacy, data retention and processing location before sending real audio.</td></tr>
+        <tr><td>Doctor and patient labels</td><td><span class="tag open">Open</span></td><td>Diarization gives "Speaker 1 and 2" only. Let the doctor confirm who is who in the review step.</td></tr>
+        <tr><td>Unsupported claims</td><td><span class="tag open">Open</span></td><td>Schema checks cover shape, not truth. Add a source quote or timestamp per claim so the doctor can verify it quickly.</td></tr>
+        <tr><td>Retention</td><td><span class="tag open">Open</span></td><td>Set when temporary audio, transcripts and drafts are deleted.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Flow 1: consultation notes</h2>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 580" role="img" aria-label="Swim-lane flow of consultation note generation: the doctor request goes to the Node.js backend, which creates a job and sends a presigned S3 URL to the AI service. The AI service fetches the recording, extracts FLAC or Opus audio, gets a transcript from a speech-to-text API, drafts a note with an LLM, validates it, and sends the draft back for the backend to store. The doctor reviews and confirms before the backend saves the final note.">
+  <defs>
+    <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+  </defs>
+  <!-- lanes -->
+  <rect class="lane" x="240" y="10" width="240" height="540"/>
+  <rect class="lane" x="720" y="10" width="240" height="540"/>
+  <text class="lane-title" x="120" y="34">Doctor website</text>
+  <text class="lane-title" x="360" y="34">Node.js backend</text>
+  <text class="lane-sub" x="360" y="48">+ MySQL, auth</text>
+  <text class="lane-title" x="600" y="34">AI service</text>
+  <text class="lane-sub" x="600" y="48">Python, FastAPI</text>
+  <text class="lane-title" x="840" y="34">External</text>
+  <text class="lane-sub" x="840" y="48">storage and AI APIs</text>
+  <line class="bound" x1="480" y1="10" x2="480" y2="550"/>
+  <text class="edge-note" x="480" y="570">Same auth token, verified on both sides of this line</text>
+
+  <!-- row 1 -->
+  <rect class="box" x="45" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="53" y="89">1 Generate notes</text><text class="bd" x="53" y="104">Doctor clicks it on</text><text class="bd" x="53" y="118">the appointment page</text>
+  <rect class="box" x="285" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="89">2 Create job</text><text class="bd" x="293" y="104">Check doctor owns visit</text><text class="bd" x="293" y="118">job=queued, presign S3</text>
+  <rect class="box" x="525" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="89">4 Fetch and inspect</text><text class="bd" x="533" y="104">Download via presigned</text><text class="bd" x="533" y="118">URL, run FFprobe</text>
+  <rect class="box ext" x="765" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="773" y="89">S3 recording</text><text class="bd" x="773" y="104">Private bucket</text><text class="bd" x="773" y="118">Short-lived URL only</text>
+  <line class="ar" x1="195" y1="100" x2="283" y2="100" marker-end="url(#a1)"/>
+  <text class="el" x="240" y="93">1 request</text><text class="el" x="240" y="114">+ token</text>
+  <line class="ar" x1="435" y1="100" x2="523" y2="100" marker-end="url(#a1)"/>
+  <text class="el" x="480" y="93">3 POST /jobs</text><text class="el" x="480" y="114">token, 202</text>
+  <line class="ar" x1="675" y1="92" x2="763" y2="92" marker-end="url(#a1)"/>
+  <line class="ar d" x1="763" y1="112" x2="677" y2="112" marker-end="url(#a1)"/>
+  <text class="el" x="720" y="85">presigned GET</text><text class="el" x="720" y="126">MP4 stream</text>
+
+  <!-- row 2 -->
+  <rect class="box ai" x="525" y="170" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="189">5 Extract audio</text><text class="bd" x="533" y="204">FLAC / Opus, one step</text><text class="bd" x="533" y="218">Validate output file</text>
+  <rect class="box ext" x="765" y="170" width="150" height="60" rx="6"/>
+  <text class="bt" x="773" y="189">6 Speech-to-text</text><text class="bd" x="773" y="204">Arabic + English</text><text class="bd" x="773" y="218">Transcript, speakers</text>
+  <line class="ar" x1="600" y1="130" x2="600" y2="168" marker-end="url(#a1)"/>
+  <line class="ar" x1="675" y1="192" x2="763" y2="192" marker-end="url(#a1)"/>
+  <line class="ar d" x1="763" y1="212" x2="677" y2="212" marker-end="url(#a1)"/>
+  <text class="el" x="720" y="185">audio</text><text class="el" x="720" y="226">transcript</text>
+
+  <!-- row 3 -->
+  <rect class="box" x="525" y="270" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="289">7 Draft the note</text><text class="bd" x="533" y="304">Prompt + JSON schema</text><text class="bd" x="533" y="318">Only what was said</text>
+  <rect class="box ext" x="765" y="270" width="150" height="60" rx="6"/>
+  <text class="bt" x="773" y="289">LLM API</text><text class="bd" x="773" y="304">Structured output</text><text class="bd" x="773" y="318">Retention: to verify</text>
+  <line class="ar" x1="600" y1="230" x2="600" y2="268" marker-end="url(#a1)"/>
+  <line class="ar" x1="675" y1="292" x2="763" y2="292" marker-end="url(#a1)"/>
+  <line class="ar d" x1="763" y1="312" x2="677" y2="312" marker-end="url(#a1)"/>
+  <text class="el" x="720" y="285">prompt+schema</text><text class="el" x="720" y="326">JSON note</text>
+
+  <!-- row 4 -->
+  <rect class="box" x="525" y="370" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="389">8 Validate</text><text class="bd" x="533" y="404">Pydantic schema check</text><text class="bd" x="533" y="418">Flag missing / unclear</text>
+  <rect class="box" x="285" y="370" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="389">9 Store draft</text><text class="bd" x="293" y="404">MySQL, job=draft_ready</text><text class="bd" x="293" y="418">Source recording kept</text>
+  <line class="ar" x1="600" y1="330" x2="600" y2="368" marker-end="url(#a1)"/>
+  <line class="ar" x1="525" y1="400" x2="437" y2="400" marker-end="url(#a1)"/>
+  <text class="el" x="480" y="393">callback</text><text class="el" x="480" y="414">status+draft</text>
+  <polyline class="ar" points="285,400 120,400 120,468" marker-end="url(#a1)"/>
+  <text class="el" x="202" y="393">doctor opens draft</text>
+
+  <!-- row 5 -->
+  <rect class="box gate" x="45" y="470" width="150" height="60" rx="6"/>
+  <text class="bt" x="53" y="489">10 Doctor review</text><text class="bd" x="53" y="504">Edit, confirm or discard</text><text class="bd" x="53" y="518">Nothing is final yet</text>
+  <rect class="box" x="285" y="470" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="489">11 Save final note</text><text class="bd" x="293" y="504">Only after confirm</text><text class="bd" x="293" y="518">Backend is the record</text>
+  <line class="ar" x1="195" y1="500" x2="283" y2="500" marker-end="url(#a1)"/>
+  <text class="el" x="240" y="493">confirm</text>
+</svg>
+    </div>
+    <div class="legend">
+      <span><i class="ln"></i> request</span>
+      <span><i class="ln d"></i> response</span>
+      <span><i class="ln b"></i> trust boundary</span>
+      <span><i class="sw ai"></i> compressed audio (FLAC / Opus)</span>
+      <span><i class="sw gate"></i> human approval gate</span>
+      <span><i class="sw ext"></i> external service</span>
+    </div>
+    <figcaption>The browser never talks to the AI service. The backend checks the doctor owns the appointment, creates the job, and passes the AI service a short-lived S3 URL. In step 9, the backend can instead poll a job status endpoint. A draft only becomes the final record at step 11.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Flow 2: patient pre-consultation brief</h2>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 470" role="img" aria-label="Swim-lane flow of the patient brief: the patient submits symptoms at booking, the backend saves the original input in MySQL and asks the AI service for a brief asynchronously, the AI service drafts it with an LLM and validates it, the backend stores it, and the doctor sees the brief next to the original input. If the AI fails, the booking still completes and the doctor sees the original input only.">
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+  </defs>
+  <rect class="lane" x="240" y="10" width="240" height="430"/>
+  <rect class="lane" x="720" y="10" width="240" height="430"/>
+  <text class="lane-title" x="120" y="34">Website</text>
+  <text class="lane-sub" x="120" y="48">patient, then doctor</text>
+  <text class="lane-title" x="360" y="34">Node.js backend</text>
+  <text class="lane-sub" x="360" y="48">+ MySQL, auth</text>
+  <text class="lane-title" x="600" y="34">AI service</text>
+  <text class="lane-sub" x="600" y="48">Python, FastAPI</text>
+  <text class="lane-title" x="840" y="34">External</text>
+  <text class="lane-sub" x="840" y="48">AI API</text>
+  <line class="bound" x1="480" y1="10" x2="480" y2="440"/>
+  <text class="edge-note" x="480" y="460">Same auth token, verified on both sides of this line</text>
+
+  <rect class="box" x="45" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="53" y="89">1 Book visit</text><text class="bd" x="53" y="104">Picks symptoms and</text><text class="bd" x="53" y="118">writes free text</text>
+  <rect class="box" x="285" y="70" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="89">2 Save input</text><text class="bd" x="293" y="104">MySQL, linked to the</text><text class="bd" x="293" y="118">appointment (original)</text>
+  <line class="ar" x1="195" y1="100" x2="283" y2="100" marker-end="url(#a2)"/>
+  <text class="el" x="240" y="93">booking</text><text class="el" x="240" y="114">submit</text>
+
+  <rect class="box" x="285" y="170" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="189">3 Request brief</text><text class="bd" x="293" y="204">Async, after booking</text><text class="bd" x="293" y="218">POST /brief + token</text>
+  <line class="ar" x1="360" y1="130" x2="360" y2="168" marker-end="url(#a2)"/>
+  <rect class="box ai" x="525" y="170" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="189">4 Draft the brief</text><text class="bd" x="533" y="204">Prompt + JSON schema</text><text class="bd" x="533" y="218">Patient words only</text>
+  <line class="ar" x1="435" y1="200" x2="523" y2="200" marker-end="url(#a2)"/>
+  <text class="el" x="480" y="193">POST /brief</text><text class="el" x="480" y="214">+ token</text>
+  <rect class="box ext" x="765" y="170" width="150" height="60" rx="6"/>
+  <text class="bt" x="773" y="189">LLM API</text><text class="bd" x="773" y="204">Structured output</text><text class="bd" x="773" y="218">Retention: to verify</text>
+  <line class="ar" x1="675" y1="192" x2="763" y2="192" marker-end="url(#a2)"/>
+  <line class="ar d" x1="763" y1="212" x2="677" y2="212" marker-end="url(#a2)"/>
+  <text class="el" x="720" y="185">prompt</text><text class="el" x="720" y="226">JSON brief</text>
+
+  <rect class="box" x="525" y="270" width="150" height="60" rx="6"/>
+  <text class="bt" x="533" y="289">5 Validate</text><text class="bd" x="533" y="304">Pydantic schema check</text><text class="bd" x="533" y="318">No diagnosis or advice</text>
+  <line class="ar" x1="600" y1="230" x2="600" y2="268" marker-end="url(#a2)"/>
+  <rect class="box" x="285" y="270" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="289">6 Store brief</text><text class="bd" x="293" y="304">MySQL, brief=ready</text><text class="bd" x="293" y="318">Original input kept</text>
+  <line class="ar" x1="525" y1="300" x2="437" y2="300" marker-end="url(#a2)"/>
+  <text class="el" x="480" y="293">callback</text><text class="el" x="480" y="314">brief JSON</text>
+  <polyline class="ar" points="285,300 120,300 120,368" marker-end="url(#a2)"/>
+  <text class="el" x="202" y="293">doctor opens brief</text>
+
+  <rect class="box gate" x="45" y="370" width="150" height="60" rx="6"/>
+  <text class="bt" x="53" y="389">7 Doctor view</text><text class="bd" x="53" y="404">Brief + original input</text><text class="bd" x="53" y="418">Before the consultation</text>
+  <rect class="box warn" x="285" y="370" width="150" height="60" rx="6"/>
+  <text class="bt" x="293" y="389">If the AI fails</text><text class="bd" x="293" y="404">Booking still completes</text><text class="bd" x="293" y="418">Doctor sees original only</text>
+</svg>
+    </div>
+    <figcaption>The patient's original text is saved in step 2, before any AI call. If the AI service is down or slow, the booking and the original input are unaffected, and the brief can be retried later.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Job status</h2>
+  <figure>
+    <div class="scroll">
+<svg viewBox="0 0 960 215" role="img" aria-label="Job status flow: queued, then fetching, extracting, transcribing and drafting, then draft ready, then the doctor either confirms or discards. Any processing step can move to failed, and a retry returns the same job to queued.">
+  <defs>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+  </defs>
+  <text class="el" x="10" y="16" style="text-anchor:start">AI service reports each status, backend stores it in MySQL</text>
+  <text class="el" x="610" y="16" style="text-anchor:start">Doctor action, via backend</text>
+
+  <rect class="st" x="10" y="40" width="96" height="44" rx="6"/><text class="stt" x="58" y="67">queued</text>
+  <rect class="st ai" x="128" y="40" width="96" height="44" rx="6"/><text class="stt" x="176" y="67">fetching</text>
+  <rect class="st ai" x="246" y="40" width="96" height="44" rx="6"/><text class="stt" x="294" y="67">extracting</text>
+  <rect class="st ai" x="364" y="40" width="96" height="44" rx="6"/><text class="stt" x="412" y="67">transcribing</text>
+  <rect class="st ai" x="482" y="40" width="96" height="44" rx="6"/><text class="stt" x="530" y="67">drafting</text>
+  <rect class="st gate" x="610" y="40" width="110" height="44" rx="6"/><text class="stt" x="665" y="67">draft_ready</text>
+  <rect class="st" x="780" y="20" width="120" height="44" rx="6"/><text class="stt" x="840" y="47">confirmed</text>
+  <rect class="st" x="780" y="90" width="120" height="44" rx="6"/><text class="stt" x="840" y="117">discarded</text>
+
+  <line class="ar" x1="106" y1="62" x2="126" y2="62" marker-end="url(#a3)"/>
+  <line class="ar" x1="224" y1="62" x2="244" y2="62" marker-end="url(#a3)"/>
+  <line class="ar" x1="342" y1="62" x2="362" y2="62" marker-end="url(#a3)"/>
+  <line class="ar" x1="460" y1="62" x2="480" y2="62" marker-end="url(#a3)"/>
+  <line class="ar" x1="578" y1="62" x2="608" y2="62" marker-end="url(#a3)"/>
+  <polyline class="ar" points="720,62 750,62 750,42 778,42" marker-end="url(#a3)"/>
+  <polyline class="ar" points="720,62 750,62 750,112 778,112" marker-end="url(#a3)"/>
+
+  <!-- failure path -->
+  <polyline class="ar d" points="128,100 128,112 578,112 578,100"/>
+  <line class="ar d" x1="353" y1="112" x2="353" y2="150" marker-end="url(#a3)"/>
+  <text class="el" x="470" y="130" style="text-anchor:start">any step can fail</text>
+  <rect class="st bad" x="298" y="152" width="110" height="44" rx="6"/><text class="stt" x="353" y="179">failed</text>
+  <polyline class="ar d" points="298,174 58,174 58,86" marker-end="url(#a3)"/>
+  <text class="el" x="178" y="167">retry, same job_id</text>
+  <text class="el" x="178" y="190">no duplicate draft or cost</text>
+</svg>
+    </div>
+    <figcaption>One job per recording or brief. Retrying the same job ID returns the existing result instead of starting a second transcription. This is what makes the later status sync safe.</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2>Rules the flows enforce</h2>
+  <div class="rules">
+    <div class="rule"><h3>Drafts only</h3><p>The AI never writes a final record. The doctor confirms in step 10 before step 11.</p></div>
+    <div class="rule"><h3>Source stays intact</h3><p>The recording and the patient's original text are kept. Generated content is stored beside them, never over them.</p></div>
+    <div class="rule"><h3>No invented clinical content</h3><p>No diagnosis, medication or advice that was not stated. Missing or unclear fields are flagged for the doctor.</p></div>
+    <div class="rule"><h3>The browser never calls the AI service</h3><p>Only the backend does, with the shared token and a short-lived S3 URL.</p></div>
+  </div>
+</section>
+
+</div>
+
+</body></html>
