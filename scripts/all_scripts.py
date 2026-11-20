@@ -40,7 +40,7 @@ from app.services.audio.metadata import inspect_media
 from app.services.storage.http_downloader import download_video
 from app.services.transcription.deepgram_client import (
     TranscriptionError,
-    to_utterances,
+    to_turns,
     transcribe_file,
 )
 
@@ -237,7 +237,7 @@ def transcribe(
     file (.txt). Speakers are numbers only; roles are assigned later.
     """
     response = transcribe_file(input_path, language=language, diarize=diarize)
-    turns = to_utterances(response)
+    turns = to_turns(response)
 
     output_dir.mkdir(parents=True, exist_ok=True)
     base = output_dir / f"{input_path.stem}.{language}"
@@ -246,13 +246,13 @@ def transcribe(
     json_path.write_text(json.dumps(response, ensure_ascii=False, indent=2), encoding="utf-8")
 
     lines = [
-        f"[{_clock(t['start'])}-{_clock(t['end'])}] Speaker {t['speaker']}: {t['text']}"
+        f"[{t.index}] [{_clock(t.start)}-{_clock(t.end)}] Speaker {t.speaker}: {t.text}"
         for t in turns
     ]
     text_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
     metadata = response.get("metadata", {})
-    speakers = sorted({t["speaker"] for t in turns if t["speaker"] is not None})
+    speakers = sorted({t.speaker for t in turns})
     print("\nTranscription")
     print(f"  Language:  {language}")
     print(f"  Duration:  {_format_duration(metadata.get('duration'))}")

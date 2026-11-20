@@ -7,7 +7,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from app.core.config import settings
 from app.services.transcription.deepgram_client import (
     TranscriptionError,
-    to_utterances,
+    to_turns,
     transcribe_file,
 )
 
@@ -63,13 +63,13 @@ def create_transcription(
             status = 503 if "not set" in str(exc) else 502
             raise HTTPException(status_code=status, detail=str(exc)) from None
 
-    turns = to_utterances(response)
+    turns = to_turns(response)
     metadata = response.get("metadata", {})
 
     return {
         "request_id": metadata.get("request_id"),
         "language": language,
         "duration_seconds": metadata.get("duration"),
-        "speakers": sorted({t["speaker"] for t in turns if t["speaker"] is not None}),
-        "utterances": turns,
+        "speakers": sorted({t.speaker for t in turns}),
+        "turns": [t.model_dump() for t in turns],
     }

@@ -11,10 +11,15 @@ URL = "/api/v1/transcriptions"
 FAKE_RESPONSE = {
     "metadata": {"request_id": "req-1", "duration": 5.0},
     "results": {
-        "utterances": [
-            {"speaker": 0, "start": 0.1, "end": 1.0, "transcript": "Hello", "confidence": 0.9},
-            {"speaker": 1, "start": 1.2, "end": 2.0, "transcript": "Hi", "confidence": 0.8},
-        ]
+        "channels": [{
+            "alternatives": [{
+                "words": [
+                    {"word": "hello", "punctuated_word": "Hello", "start": 0.1, "end": 0.5, "speaker": 0},
+                    {"word": "there", "punctuated_word": "there.", "start": 0.5, "end": 1.0, "speaker": 0},
+                    {"word": "hi", "punctuated_word": "Hi.", "start": 1.2, "end": 2.0, "speaker": 1},
+                ]
+            }]
+        }]
     },
 }
 
@@ -45,7 +50,8 @@ def test_transcription_returns_speaker_turns(fake_deepgram):
     body = response.json()
     assert body["request_id"] == "req-1"
     assert body["speakers"] == [0, 1]
-    assert body["utterances"][0]["text"] == "Hello"
+    assert [t["text"] for t in body["turns"]] == ["Hello there.", "Hi."]
+    assert body["turns"][1]["speaker"] == 1
     assert fake_deepgram["language"] == "ar-EG"
     assert fake_deepgram["existed"] is True
     assert not fake_deepgram["path"].exists()  # temp upload is removed
@@ -90,3 +96,12 @@ def test_provider_error_becomes_502(monkeypatch):
     response = client.post(URL, files={"file": ("a.opus", b"x", "audio/ogg")})
 
     assert response.status_code == 502
+
+
+def test_turns_split_when_the_speaker_changes():
+    from app.services.transcription.deepgram_client import to_turns
+
+    turns = to_turns(FAKE_RESPONSE)
+
+    assert [(t.index, t.speaker, t.text) for t in turns] == [(0, 0, "Hello there."), (1, 1, "Hi.")]
+    assert turns[0].start == 0.1 and turns[0].end == 1.0

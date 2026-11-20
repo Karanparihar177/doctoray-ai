@@ -10,6 +10,7 @@ from pathlib import Path
 import httpx
 
 from app.core.config import settings
+from app.schemas.consultation import TranscriptTurn
 
 CONTENT_TYPES = {
     ".opus": "audio/ogg",
@@ -98,3 +99,35 @@ def to_utterances(response: dict) -> list[dict]:
         }
         for u in utterances
     ]
+
+
+def to_turns(response: dict) -> list[TranscriptTurn]:
+    """Build speaker turns from word-level speaker labels.
+
+    Deepgram's utterances can contain words from both speakers, so the
+    LLM input is rebuilt here: a new turn starts whenever the speaker changes.
+    """
+    channels = response.get("results", {}).get("channels") or [{}]
+    alternatives = channels[0].get("alternatives") or [{}]
+    words = alternatives[0].get("words") or []
+
+    turns: list[TranscriptTurn] = []
+    for word in words:
+        speaker = word.get("speaker", 0)
+        text = word.get("punctuated_word") or word.get("word", "")
+        if turns and turns[-1].speaker == speaker:
+            last = turns[-1]
+            turns[-1] = last.model_copy(
+                update={"text": f"{last.text} {text}", "end": word.get("end")}
+            )
+        else:
+            turns.append(
+                TranscriptTurn(
+                    index=len(turns),
+                    speaker=speaker,
+                    start=word.get("start"),
+                    end=word.get("end"),
+                    text=text,
+                )
+            )
+    return turns
